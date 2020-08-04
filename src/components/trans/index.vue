@@ -2,7 +2,7 @@
   <div>
     <fieldset class="upload-excel">
       <legend>上传</legend>
-      <el-upload class="upload-demo" drag action="http://112.74.181.151:3000/upload/files" :on-success="uploadSuccess">
+      <el-upload class="upload-demo" drag action="http://localhost:3000/upload/files" :on-success="uploadSuccess">
         <i class="el-icon-upload"></i>
         <div class="el-upload__text">
           将文件拖到此处，或
@@ -36,23 +36,24 @@ export default {
   },
   methods: {
     uploadSuccess(response, file, fileList) {
-      this.transArr = response.data.data;
-      this.fileId = response.data.fileId;
+      const { data, fileId } = response.data;
+      this.transArr = data;
+      this.fileId = fileId;
     },
     tarnsLanChange(value){
       this.value = value
     },
     async transClick(){
-      const response = await this.axios.post('http://112.74.181.151:3000/upload/translate', { transKey: this.value, fileId: this.fileId });
+      const response = await this.axios.post('http://localhost:3000/upload/translate', { transKey: this.value, fileId: this.fileId });
       if (response.data.downloadId) {
-        const iframeDom = document.getElementById('translate-download-iframe');
+        const iframeDom = document.getElementById('translate-download');
         if (iframeDom) {
           document.body.removeChild(iframeDom);
         }
         const iframe = document.createElement('iframe');
         iframe.style.display = 'none';
-        iframe.src = `http://112.74.181.151:3000/upload/excel/${response.data.downloadId}`;
-        iframe.id = 'translate-download-iframe';
+        iframe.src = `http://localhost:3000/upload/excel/${response.data.downloadId}`;
+        iframe.id = 'translate-download';
         document.body.appendChild(iframe);
         }
     }
