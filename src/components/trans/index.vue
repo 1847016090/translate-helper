@@ -1,8 +1,13 @@
 <template>
-  <div>
+  <div v-loading="loading">
     <fieldset class="upload-excel">
       <legend>上传</legend>
-      <el-upload class="upload-demo" drag action="http://localhost:3000/upload/files" :on-success="uploadSuccess">
+      <el-upload
+        class="upload-demo"
+        drag
+        action="http://localhost:3000/upload/files"
+        :on-success="uploadSuccess"
+      >
         <i class="el-icon-upload"></i>
         <div class="el-upload__text">
           将文件拖到此处，或
@@ -17,8 +22,8 @@
           v-for="item in transArr"
           :key="item.value"
           :label="item.label"
-          :value="item.value">
-        </el-option>
+          :value="item.value"
+        ></el-option>
       </el-select>
       <el-button type="primary" @click="transClick">点击翻译</el-button>
     </fieldset>
@@ -29,10 +34,11 @@
 export default {
   data() {
     return {
-      value: '',
+      value: "",
       transArr: [],
-      fileId: ''
-    }
+      fileId: "",
+      loading: false,
+    };
   },
   methods: {
     uploadSuccess(response, file, fileList) {
@@ -40,24 +46,29 @@ export default {
       this.transArr = data;
       this.fileId = fileId;
     },
-    tarnsLanChange(value){
-      this.value = value
+    tarnsLanChange(value) {
+      this.value = value;
     },
-    async transClick(){
-      const response = await this.axios.post('http://localhost:3000/upload/translate', { transKey: this.value, fileId: this.fileId });
+    async transClick() {
+      this.loading = true;
+      const response = await this.axios.post(
+        "http://localhost:3000/upload/translate",
+        { transKey: this.value, fileId: this.fileId }
+      );
       if (response.data.downloadId) {
-        const iframeDom = document.getElementById('translate-download');
+        const iframeDom = document.getElementById("translate-download");
         if (iframeDom) {
           document.body.removeChild(iframeDom);
         }
-        const iframe = document.createElement('iframe');
-        iframe.style.display = 'none';
+        const iframe = document.createElement("iframe");
+        iframe.style.display = "none";
         iframe.src = `http://localhost:3000/upload/excel/${response.data.downloadId}`;
-        iframe.id = 'translate-download';
+        iframe.id = "translate-download";
         document.body.appendChild(iframe);
-        }
-    }
-  }
+        this.loading = false;
+      }
+    },
+  },
 };
 </script>
 
